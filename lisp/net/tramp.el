@@ -4729,7 +4729,7 @@ Do not set it manually, it is used buffer-local in `tramp-get-lock-pid'.")
 (defun tramp-expand-args (vec parameter &rest spec-list)
   "Expand login arguments as given by PARAMETER in `tramp-methods'.
 PARAMETER is a symbol like `tramp-login-args', denoting a list of
-list of strings from `tramp-methods', containing %-sequences for
+list of strings or lambdas that expect `tramp-file-name' type parameter from `tramp-methods', containing %-sequences for
 substitution.  SPEC-LIST is a list of char/value pairs used for
 `format-spec-make'."
   (let ((args (tramp-get-method-parameter vec parameter))
@@ -4738,6 +4738,8 @@ substitution.  SPEC-LIST is a list of char/value pairs used for
     (tramp-compat-flatten-tree
      (mapcar
       (lambda (x)
+        (cond ((functionp x) (setq x (list (funcall x vec))))
+              (t (setq x (mapcar (lambda (y) (format-spec y spec)) x))))
 	(setq x (mapcar (lambda (y) (format-spec y spec)) x))
 	(unless (member "" x) x))
       args))))

@@ -117,6 +117,25 @@ see its function help for a description of the format."
     (mapcar (lambda (m) (list nil m)) (delq nil names))))
 
 ;;;###tramp-autoload
+(defun tramp-kubernetes--pod-containers (pod)
+  "Return list of containers in Kubernetes Pod POD."
+  (split-string (shell-command-to-string
+		 (concat tramp-kubernetes-program
+                         " get po "
+                         pod
+                         " -o jsonpath='{.spec.containers[*].name}' "))))
+
+;;;###tramp-autoload
+(defun tramp-kubernetes--pod-container (pod)
+  "Get container in Kubernetes Pod POD.
+
+If `enable-recusrive-minibuffers' set to nil or a pod has a single container then return first container in list by default.  Otherwise allow the user to select from a list of containers"
+  (let ((containers (tramp-kubernetes--pod-containers pod)))
+    (cond ((not enable-recursive-minibuffers) (nth 0 containers))
+          ((length= containers 1) (nth 0 containers))
+          (t (completing-read "Select container: " containers  nil t)))))
+
+;;;###tramp-autoload
 (defun tramp-kubernetes--completion-function (&rest _args)
   "List Kubernetes pods available for connection.
 
@@ -185,6 +204,8 @@ see its function help for a description of the format."
                 (tramp-login-args (("exec")
                                    ("%h")
                                    ("-it")
+                                   ("-c")
+                                   (lambda (vec) (tramp-kubernetes--pod-container (tramp-file-name-host vec)))
                                    ("--")
 			           ("%l")))
 		(tramp-config-check tramp-kubernetes--current-context-data)

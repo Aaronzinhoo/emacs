@@ -927,6 +927,16 @@ pod is used.
 
 This method does not support user names.
 
+@item @option{kubernetes}
+@cindex method @option{kubernetes}
+@cindex @option{kubernetes} method
+
+Integration for selecting a container in a Kubernetes pods.  The
+containers are returned by
+@samp{"kubectl get po pod -o jsonpath='{.spec.containers[*].name}'"}.
+If there is more than one pod and enable-recursive-minibuffers is
+enabled then the user is prompted to select a container.
+
 @end table
 
 

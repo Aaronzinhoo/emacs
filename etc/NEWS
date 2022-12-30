@@ -117,6 +117,12 @@ point is not in a comment or a string.  It is by default bound to
 
 * Lisp Changes in Emacs 30.1
 
+** Tramp
+
+---
+*** Allow user to select kubernetes container when connecting to pod.
+Allow selection of a container when connecting to kubernetes pod via Tramp.
+
 ** New or changed byte-compilation warnings
 
 ---
